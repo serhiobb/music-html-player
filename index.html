@@ -1,0 +1,123 @@
+
+<!doctype html>
+
+<body>
+<a href="#play">play</a>
+<a href="#stop">stop</a>
+<div>
+	<div style="width:100%; margin-left: 0px; background-color:#00FF00">
+		#########
+	</div>
+</div>
+	<select name="track" id="track1">
+		<option value="2Pac - Thug 4 Life.mp3">2Pac - Thug 4 Life</option>
+		<option value="Akira Yamaoka - Dance With Night Wind.mp3">Akira Yamaoka - Dance With Night Wind</option>
+		<option value="Best Movie Soundtracks - Main Title Theme (From Knight Rider).mp3">Best Movie Soundtracks - Main Title Theme (From Knight Rider)</option>
+		<option value="Billy McLaughlin - Fingerdance.mp3">Billy McLaughlin - Fingerdance</option>
+		<option value="Billy McLaughlin - Hurricane Bob.mp3">Billy McLaughlin - Hurricane Bob</option>
+		<option value="Black Veil Brides - Fear + In The End.mp3">Black Veil Brides - Fear + In The End</option>
+		<option value="Earth Worm Jim 2 - ISO 9000.mp3">Earth Worm Jim 2 - ISO 9000</option>
+		<option value="Earthworm Jim - What the Heck_.mp3">Earthworm Jim - What the Heck_</option>
+		<option value="FatBoy Slim - Weapon of choice.mp3">FatBoy Slim - Weapon of choice</option>
+		<option value="Jefferson Airplane - White Rabbit.mp3">Jefferson Airplane - White Rabbit</option>
+		<option value="Jeremy Soule - Call of magick.mp3">Jeremy Soule - Call of magick</option>
+		<option value="Jesper Kyd - Headquarter.mp3">Jesper Kyd - Headquarter</option>
+		<option value="Megadeth - Duke Nukem Theme.mp3">Megadeth - Duke Nukem Theme</option>
+		<option value="MGMT - Kids.mp3">MGMT - Kids</option>
+		<option value="MGMT - Time to Pretend.mp3">MGMT - Time to Pretend</option>
+		<option value="Michael Hedges - The 2nd Law.mp3">Michael Hedges - The 2nd Law</option>
+		<option value="Moby - Temptation.mp3">Moby - Temptation</option>
+		<option value="Mortal Kombat - Reptile Theme.mp3">Mortal Kombat - Reptile Theme</option>
+		<option value="Mudimbi - Supercalifrigida.mp3">Mudimbi - Supercalifrigida</option>
+		<option value="Onyx - Slam.mp3">Onyx - Slam</option>
+		<option value="Pendulum - Propane Nightmares (original).mp3">Pendulum - Propane Nightmares (original)</option>
+		<option value="Propellerheads - Spybreak !.mp3">Propellerheads - Spybreak !</option>
+		<option value="Queen - Princes Of The Universe.mp3">Queen - Princes Of The Universe</option>
+		<option value="Red Zone [Jesper Kyd] - Walking Remix.mp3">Red Zone [Jesper Kyd] - Walking Remix</option>
+		<option value="Skrillex ft. Oliver Sykes - Sleep With One Eye Open.mp3">Skrillex ft. Oliver Sykes - Sleep With One Eye Open</option>
+		<option value="Special Request - Mindwash.mp3">Special Request - Mindwash</option>
+		<option value="The Animals - House of the Rising Sun.mp3">The Animals - House of the Rising Sun</option>
+		The Glitch Mob ft. Metal Mother - Becoming Harmonious [Edge of <option value="The Glitch Mob ft. Metal Mother - Becoming Harmonious [Edge of Tomorrow OST].mp3">The Glitch Mob ft. Metal Mother - Becoming Harmonious [Edge of Tomorrow OST]</option>
+		<option value="The Return of Jafar - You're Only Second Rate.mp3">The Return of Jafar - You're Only Second Rate</option>
+		<option value="Tommy Tallarico - Granny Bag.mp3">Tommy Tallarico - Granny Bag</option>
+		<option value="Tomoyasu Hotei - Battle Without Honor Or Humanity.mp3">Tomoyasu Hotei - Battle Without Honor Humanity.mp3</option>
+		<option value="TV Theme Song Library - Quantum Leap.mp3">TV Theme Song Library - Quantum Leap</option>
+		<option value="Zlad! - Electronic Supersonic.mp3">Zlad! - Electronic Supersonic</option>
+	</select>
+<script>
+	var track = document.getElementById('track1')
+	const audioCtx = new AudioContext();
+	const audioEle = new Audio();
+
+	audioCtx.addEventListener('audioprocess', function(evy){
+
+	});
+
+	function playTrack(trackName){
+		audioEle.src = ''+trackName;//insert file name here
+		audioEle.autoplay = true;
+		audioEle.preload = 'auto';
+		const audioSourceNode = audioCtx.createMediaElementSource(audioEle);
+
+		//Create analyser node
+		const analyserNode = audioCtx.createAnalyser();
+		analyserNode.fftSize = 128;//16384;
+		const bufferLength = analyserNode.frequencyBinCount;
+		console.log(bufferLength);
+		const dataArray = new Float32Array(bufferLength);
+
+		//Set up audio node network
+		audioSourceNode.connect(analyserNode);
+		analyserNode.connect(audioCtx.destination);
+
+		// //Create 2D canvas
+		const canvas = document.createElement('canvas');
+		canvas.style.position = 'absolute';
+		canvas.style.marginTop = '36px'
+		canvas.style.top = 0;
+		canvas.style.left = 0;
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		document.body.appendChild(canvas);
+		const canvasCtx = canvas.getContext('2d');
+		canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+		function draw() {
+		  //Schedule next redraw
+		  requestAnimationFrame(draw);
+
+		  //Get spectrum data
+		  analyserNode.getFloatFrequencyData(dataArray);
+
+		  //Draw black background
+		  canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+		  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+		  //Draw spectrum
+		  const barWidth = (canvas.width / bufferLength) / 5;
+		  var posX = 0;
+		  for (var i = 0; i < bufferLength; i++) {
+		    const barHeight = (dataArray[i] + 140) * 20;
+		    canvasCtx.fillStyle = 'rgb(50, ' + Math.floor(barHeight + 100) + ', 50)';
+		    canvasCtx.fillRect(posX, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+		    posX += barWidth + 1;
+		  }
+		};
+
+		draw();
+	}
+
+
+	track.onchange = function(evy){
+		playTrack(evy.target.value);
+	}
+	var nn = 0; 
+	document.body.onclick = function(evy){
+		track.value = track.options[nn].value;
+		nn += 1; if(nn >= track.options.length) nn = 0;
+		playTrack(track.options[nn].value);
+	}	
+
+</script>
+</body>
