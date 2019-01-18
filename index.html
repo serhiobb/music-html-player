@@ -48,16 +48,28 @@
 	var track = document.getElementById('track1')
 	const audioCtx = new AudioContext();
 	const audioEle = new Audio();
+	audioSourceNode = audioCtx.createMediaElementSource(audioEle);
 
-	audioCtx.addEventListener('audioprocess', function(evy){
+	const canvas = document.createElement('canvas');
+		canvas.style.position = 'absolute';
+		canvas.style.marginTop = '64px'
+		canvas.style.top = 0;
+		canvas.style.left = 0;
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		document.body.appendChild(canvas);
+		const canvasCtx = canvas.getContext('2d');
+		canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-	});
+	// audioCtx.addEventListener('audioprocess', function(evy){
+
+	// });
 
 	function playTrack(trackName){
 		audioEle.src = ''+trackName;//insert file name here
 		audioEle.autoplay = true;
 		audioEle.preload = 'auto';
-		const audioSourceNode = audioCtx.createMediaElementSource(audioEle);
+		// 
 
 		//Create analyser node
 		const analyserNode = audioCtx.createAnalyser();
@@ -71,16 +83,7 @@
 		analyserNode.connect(audioCtx.destination);
 
 		// //Create 2D canvas
-		const canvas = document.createElement('canvas');
-		canvas.style.position = 'absolute';
-		canvas.style.marginTop = '36px'
-		canvas.style.top = 0;
-		canvas.style.left = 0;
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
-		document.body.appendChild(canvas);
-		const canvasCtx = canvas.getContext('2d');
-		canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+		
 
 
 		function draw() {
@@ -111,12 +114,14 @@
 
 	track.onchange = function(evy){
 		playTrack(evy.target.value);
+		console.log(evy.target.value + 'onchange');
 	}
-	var nn = 0; 
-	document.body.onclick = function(evy){
+	var nn = 0;
+	canvas.onclick = function(evy){
 		track.value = track.options[nn].value;
 		nn += 1; if(nn >= track.options.length) nn = 0;
 		playTrack(track.options[nn].value);
+		console.log(track.options[nn].value);
 	}	
 
 </script>
